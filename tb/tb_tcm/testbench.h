@@ -4,8 +4,11 @@
 #include <unistd.h>
 #include <iomanip>
 
-#include "riscv_tcm_top_rtl.h"
 #include "Vriscv_tcm_top.h"
+#include "Vriscv_tcm_top_riscv_tcm_top.h"
+#include "Vriscv_tcm_top_tcm_mem.h"
+
+#include "riscv_tcm_top_rtl.h"
 
 #include "verilated.h"
 #include "verilated_vcd_sc.h"
@@ -153,7 +156,7 @@ public:
     */
 
     void init_dut() {
-        m_dut = std::make_unique<riscv_tcm_top_rtl>("DUT"); // Используем std::make_unique
+        m_dut = std::make_unique<riscv_tcm_top_rtl>("DUT");
         //m_dut = new riscv_tcm_top_rtl("DUT");
         m_dut->clk_in(clk);
         m_dut->rst_in(rst);
@@ -207,40 +210,32 @@ public:
     //-----------------------------------------------------------------
     void write(uint32_t addr, uint8_t data)
     {
-        std::cout << "Try to write memory\n" << endl;
-
+        std::cout << "Write memory" << std::endl;
 #ifdef DEBUG_TCM
         static size_t count = 0;
-        std::cout << "Try to write memory\n" 
-                << " Addr: " << std::hex << addr 
-                << " Data: " << std::setw(2) << std::setfill('0') << (int)data;
-
+        std::cout << "Addr: " << std::hex << addr 
+                    << "Data: " << std::setw(2) << std::setfill('0') 
+                    << (int)data;
         count++;
         std::cout << "\tBytes written: " << count << std::endl;
 #endif
-
         //Template fix. 
-        //m_dut->m_rtl->__VlSymsp->TOP__v__u_tcm.write(addr, data);
-
-        //Starting with version 4.2 verilator takes a different approach to memory access.
-        // It is no longer possible to directly get write access to internal signals.
-        // It is now necessary to access using “DPI-C” or “rootp” via a header file of the form:  “Vriscv_tcm_top.h”.
+        m_dut->m_rtl->v->u_tcm->write(addr,data);
     }
     //-----------------------------------------------------------------
     // write: Read byte from memory
     //-----------------------------------------------------------------
     uint8_t read(uint32_t addr)
     {
-
 #ifdef DEBUG_TCM
-        std::cout << "Try to read memory" << std::endl;
+        uint32_t readData = m_dut->m_rtl->v->u_tcm->read(addr);
+        std::cout << "Addr: " << std::hex << addr 
+                    << "Data: " << std::setw(2) << std::setfill('0') 
+                    << (int)readData << std::endl;
+        return readData;
 #endif
-        // Template fix.
-        //return m_dut->m_rtl->__VlSymsp->TOP__v__u_tcm.read(addr);
-        
-        // Starting with version 4.2 verilator takes a different approach to memory access.
-        // It is no longer possible to directly get write access to internal signals.
-        // It is now necessary to access using “DPI-C” or “rootp” via a header file of the form:  “Vriscv_tcm_top.h”.
-        return 0x55;
+#ifndef DEBUG_TCM
+        return m_dut->m_rtl->v->u_tcm->read(addr);
+#endif
     }
 };
