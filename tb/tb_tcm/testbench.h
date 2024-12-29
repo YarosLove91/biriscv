@@ -2,10 +2,11 @@
 #include "elf_load.h"
 #include <getopt.h>
 #include <unistd.h>
+#include <iomanip>
 
 #include "riscv_tcm_top_rtl.h"
 #include "Vriscv_tcm_top.h"
-#include "Vriscv_tcm_top__Syms.h"
+#include "Vriscv_tcm_top___024root.h"
 
 #include "verilated.h"
 #include "verilated_vcd_sc.h"
@@ -43,8 +44,8 @@ public:
     //-----------------------------------------------------------------
     // Instances / Members
     //-----------------------------------------------------------------      
-    riscv_tcm_top_rtl           *m_dut;
-
+    riscv_tcm_top_rtl *m_dut; // Pointing to DUT (Design Under Test)
+    
     int                          m_argc;
     char**                       m_argv;
     //-----------------------------------------------------------------
@@ -131,8 +132,24 @@ public:
     // Construction
     //-----------------------------------------------------------------
     SC_HAS_PROCESS(testbench);
-    testbench(sc_module_name name): testbench_vbase(name)
+    testbench(sc_module_name name) : testbench_vbase(name), m_dut(nullptr) // DUT pointer initialize
     {
+        init_dut(); 
+    }
+
+    /*
+    The m_dut variable is now a class variable for 
+    subsequent memory access via the `rootp` mechanism.
+    The functions will be represented as follows in 
+    the “Vriscv_tcm_top_tcm_mem.h” file
+    
+    // INTERNAL METHODS
+    void __Vconfigure(bool first);
+    uint32_t read(uint32_t addr);
+    bool write(uint32_t addr, uint32_t data);
+    */
+
+    void init_dut() {
         m_dut = new riscv_tcm_top_rtl("DUT");
         m_dut->clk_in(clk);
         m_dut->rst_in(rst);
@@ -142,8 +159,16 @@ public:
         m_dut->axi_i_out(axi_i_out);
         m_dut->axi_i_in(axi_i_in);
         m_dut->intr_in(intr_in);
-		
-		verilator_trace_enable("verilator.vcd", m_dut);
+    }
+    /* 
+    Tracing of design work must now be enabled separately,
+    so that it is possible to preset the system settings. 
+    Otherwise, we get an error.
+    */
+
+    //Enabling the design tracer
+    void enable_verilator_trace() {
+        verilator_trace_enable("verilator.vcd", m_dut);
     }
     //-----------------------------------------------------------------
     // Trace
