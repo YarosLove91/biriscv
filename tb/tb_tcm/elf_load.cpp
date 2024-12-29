@@ -5,8 +5,10 @@
 #include <libelf.h>
 #include <fcntl.h>
 #include <gelf.h>
-#include <bfd.h>
 #include <string>
+
+#define PACKAGE_VERSION 1
+#include <bfd.h>
 
 #include "elf_load.h"
 
