@@ -17,15 +17,27 @@ ifeq (,$(wildcard $(SYSTEMC_HOME)))
 endif
 
 ###############################################################################
+## Multithreading
+###############################################################################
+
+NUM_THREADS := $(shell nproc)
+
+ifeq ($(NUM_THREADS), 0)
+	NUM_THREADS := 2
+else
+	NUM_THREADS := $(shell echo "$$(( $(NUM_THREADS) - 2 ))")
+endif
+
+###############################################################################
 ## Makefile
 ###############################################################################
 .PHONY: build
 all: build
 
 build:
-	make -f makefile.generate_verilated
-	make -f makefile.build_verilated
-	make -f makefile.build_sysc_tb
+	make -f makefile.generate_verilated	-j $(NUM_THREADS)
+	make -f makefile.build_verilated	-j $(NUM_THREADS)
+	make -f makefile.build_sysc_tb		-j $(NUM_THREADS)
 
 clean:
 	make -f makefile.generate_verilated
