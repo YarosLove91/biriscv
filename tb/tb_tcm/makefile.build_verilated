@@ -2,7 +2,7 @@
 # Variables
 ###############################################################################
 VERILATOR_SRC ?= /usr/share/verilator/include
-SYSTEMC_HOME  ?= /usr/local/systemc-2.3.1
+SYSTEMC_HOME  ?= /usr/local/systemc-3.0.1
 
 SRC_DIR       ?= verilated/
 OBJ_DIR       ?= obj_verilated/
