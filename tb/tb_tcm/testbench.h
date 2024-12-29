@@ -14,6 +14,8 @@
 #define MEM_BASE 0x00000000
 #define MEM_SIZE (64 * 1024)
 
+#define DEBUG_TCM
+
 //-----------------------------------------------------------------
 // Command line options
 //-----------------------------------------------------------------
@@ -203,6 +205,17 @@ public:
     //-----------------------------------------------------------------
     void write(uint32_t addr, uint8_t data)
     {
+
+    #ifdef DEBUG_TCM
+        static size_t count = 0;
+        std::cout << "Try to write memory\n" 
+                << " Addr: " << std::hex << addr 
+                << " Data: " << std::setw(2) << std::setfill('0') << (int)data;
+
+        count++;
+        std::cout << "\tBytes written: " << count << std::endl;
+#endif
+
         //Template fix. 
         //m_dut->m_rtl->__VlSymsp->TOP__v__u_tcm.write(addr, data);
 
@@ -215,6 +228,10 @@ public:
     //-----------------------------------------------------------------
     uint8_t read(uint32_t addr)
     {
+
+#ifdef DEBUG_TCM
+        std::cout << "Try to read memory" << std::endl;
+#endif
         // Template fix.
         //return m_dut->m_rtl->__VlSymsp->TOP__v__u_tcm.read(addr);
         
