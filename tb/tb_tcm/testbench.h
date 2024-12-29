@@ -6,7 +6,6 @@
 
 #include "riscv_tcm_top_rtl.h"
 #include "Vriscv_tcm_top.h"
-#include "Vriscv_tcm_top___024root.h"
 
 #include "verilated.h"
 #include "verilated_vcd_sc.h"
@@ -208,8 +207,9 @@ public:
     //-----------------------------------------------------------------
     void write(uint32_t addr, uint8_t data)
     {
+        std::cout << "Try to write memory\n" << endl;
 
-    #ifdef DEBUG_TCM
+#ifdef DEBUG_TCM
         static size_t count = 0;
         std::cout << "Try to write memory\n" 
                 << " Addr: " << std::hex << addr 

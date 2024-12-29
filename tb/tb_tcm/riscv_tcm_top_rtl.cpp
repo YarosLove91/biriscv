@@ -15,13 +15,17 @@
 riscv_tcm_top_rtl::riscv_tcm_top_rtl(sc_module_name name): sc_module(name)
 {
     //DUT context. Should be initialized first!
-    context_DUT = std::make_unique<VerilatedContext>();
-    context_DUT->debug(0);
-    context_DUT->randReset(2);
+    //const std::unique_ptr<VerilatedContext> context_DUT { new VerilatedContext};
+    //context_DUT->debug(0);
+    //context_DUT->randReset(2);
     
-    m_rtl = new Vriscv_tcm_top("Vriscv_tcm_top");
+    // UPD
+    // Verilator context is not required for SystemC!
+    // Context is needed only for C++!
+
+    //m_rtl = new Vriscv_tcm_top("Vriscv_tcm_top");
     //TODO:replace to unique_ptr
-    //m_rtl = std::make_unique<Vriscv_tcm_top>({context_DUT.get(), "riscv_tcm_top"});
+    std::unique_ptr<Vriscv_tcm_top> m_rtl {new Vriscv_tcm_top {"riscv_tcm_top"}};
     
     m_rtl->clk_i(m_clk_in);
     m_rtl->rst_i(m_rst_in);
