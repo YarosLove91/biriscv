@@ -1,0 +1,15 @@
+tb/tb_core_icarus/build/
+
+
+tb/tb_top/build/
+tb/tb_top/lib/
+tb/tb_top/obj_verilated
+tb/tb_top/verilated
+
+tb/tb_tcm/build/
+tb/tb_tcm/lib/
+tb/tb_tcm/obj_verilated
+tb/tb_tcm/verilated
+*.o
+.vscode/
+.idea/
