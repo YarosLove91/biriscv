@@ -178,13 +178,23 @@ public:
     //-----------------------------------------------------------------
     void write(uint32_t addr, uint8_t data)
     {
-        m_dut->m_rtl->__VlSymsp->TOP__v__u_tcm.write(addr, data);
+        //Template fix. 
+        //m_dut->m_rtl->__VlSymsp->TOP__v__u_tcm.write(addr, data);
+
+        //Starting with version 4.2 verilator takes a different approach to memory access.
+        // It is no longer possible to directly get write access to internal signals.
+        // It is now necessary to access using “DPI-C” or “rootp” via a header file of the form:  “Vriscv_tcm_top.h”.
     }
     //-----------------------------------------------------------------
     // write: Read byte from memory
     //-----------------------------------------------------------------
     uint8_t read(uint32_t addr)
     {
-        return m_dut->m_rtl->__VlSymsp->TOP__v__u_tcm.read(addr);
+        // Template fix.
+        //return m_dut->m_rtl->__VlSymsp->TOP__v__u_tcm.read(addr);
+        
+        // Starting with version 4.2 verilator takes a different approach to memory access.
+        // It is no longer possible to directly get write access to internal signals.
+        // It is now necessary to access using “DPI-C” or “rootp” via a header file of the form:  “Vriscv_tcm_top.h”.
     }
 };
