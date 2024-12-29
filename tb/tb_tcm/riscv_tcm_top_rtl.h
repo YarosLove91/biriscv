@@ -2,9 +2,14 @@
 #define RISCV_TCM_TOP_RTL_H
 
 #include <systemc.h>
+#include <verilated.h>
+
+// For std::unique_ptr
+#include <memory>
 
 #include "axi4_lite.h"
 #include "axi4.h"
+#include "Vriscv_tcm_top.h"
 
 class Vriscv_tcm_top;
 class VerilatedVcdC;
@@ -111,7 +116,18 @@ private:
     sc_signal <bool> m_axi_t_rlast_out;
 
 public:
+    //VerilatedContext* context_DUT = new VerilatedContext;
+    //TODO:Redesign the program to the preferred use case using smart pointers.
+    std::unique_ptr<VerilatedContext> context_DUT; // {new VerilatedContext};
+    
+    // Design
     Vriscv_tcm_top *m_rtl;
+    //TODO:Redesign the program to the preferred use case using smart pointers.
+    // see testbecnch.h:init_dut() and riscv_tcm_top_rtl.h:14
+    //std::unique_ptr<Vriscv_tcm_top> m_rtl;    //{new Vriscv_tcm_top{context_DUT.get(),"riscv_tcm_top"}};
+    // see example at: https://github.com/verilator/verilator/blob/72a47e16c124e3c0f93c16d5049e0db79764bc01/examples/make_tracing_c/sim_main.cpp#L33
+    // https://github.com/verilator/verilator/blob/master/include/verilated.h
+
 #if VM_TRACE
     VerilatedVcdC  * m_vcd;
     bool             m_delay_waves;

@@ -46,8 +46,10 @@ public:
     //-----------------------------------------------------------------
     // Instances / Members
     //-----------------------------------------------------------------      
-    riscv_tcm_top_rtl *m_dut; // Pointing to DUT (Design Under Test)
-    
+    //riscv_tcm_top_rtl *m_dut; // Pointing to DUT (Design Under Test)
+    //TODO:Test this approach
+    std::unique_ptr<riscv_tcm_top_rtl> m_dut; 
+
     int                          m_argc;
     char**                       m_argv;
     //-----------------------------------------------------------------
@@ -152,7 +154,8 @@ public:
     */
 
     void init_dut() {
-        m_dut = new riscv_tcm_top_rtl("DUT");
+        m_dut = std::make_unique<riscv_tcm_top_rtl>("DUT"); // Используем std::make_unique
+        //m_dut = new riscv_tcm_top_rtl("DUT");
         m_dut->clk_in(clk);
         m_dut->rst_in(rst);
         m_dut->rst_cpu_in(rst_cpu_in);
@@ -238,5 +241,6 @@ public:
         // Starting with version 4.2 verilator takes a different approach to memory access.
         // It is no longer possible to directly get write access to internal signals.
         // It is now necessary to access using “DPI-C” or “rootp” via a header file of the form:  “Vriscv_tcm_top.h”.
+        return 0x55;
     }
 };

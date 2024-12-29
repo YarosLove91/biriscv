@@ -6,12 +6,23 @@
 #include "verilated_vcd_c.h"
 #endif
 
+
+    // const std::unique_ptr<Vriscv_tcm_top_tcm_mem> top{new Vriscv_tcm_top_tcm_mem{contextp.get(), "TCM_MemoryModule"}};
+    // std::unique_ptr<Vriscv_tcm_top_tcm_mem> top = std::make_unique<Vriscv_tcm_top_tcm_mem>(contextp.get(), "MyMemoryModule");
 //-------------------------------------------------------------
 // Constructor
 //-------------------------------------------------------------
 riscv_tcm_top_rtl::riscv_tcm_top_rtl(sc_module_name name): sc_module(name)
 {
+    //DUT context. Should be initialized first!
+    context_DUT = std::make_unique<VerilatedContext>();
+    context_DUT->debug(0);
+    context_DUT->randReset(2);
+    
     m_rtl = new Vriscv_tcm_top("Vriscv_tcm_top");
+    //TODO:replace to unique_ptr
+    //m_rtl = std::make_unique<Vriscv_tcm_top>({context_DUT.get(), "riscv_tcm_top"});
+    
     m_rtl->clk_i(m_clk_in);
     m_rtl->rst_i(m_rst_in);
     m_rtl->rst_cpu_i(m_rst_cpu_in);
