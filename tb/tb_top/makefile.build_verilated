@@ -32,6 +32,7 @@ SRC_LIST      = $(foreach src,$(SRC_DIR),$(wildcard $(src)/*.cpp))
 SRC_LIST     += $(VERILATOR_SRC)/verilated.cpp
 SRC_LIST     += $(VERILATOR_SRC)/verilated_vcd_c.cpp
 SRC_LIST     += $(VERILATOR_SRC)/verilated_vcd_sc.cpp
+SRC_LIST     += $(VERILATOR_SRC)/verilated_threads.cpp
 
 OBJ          ?= $(foreach src,$(SRC_LIST),$(call src2obj,$(src)))
 
