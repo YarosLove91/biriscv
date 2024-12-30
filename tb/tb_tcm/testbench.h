@@ -16,7 +16,7 @@
 #define MEM_BASE 0x00000000
 #define MEM_SIZE (64 * 1024)
 
-#define DEBUG_TCM
+#define PRINT_TCM
 
 //-----------------------------------------------------------------
 // Command line options
@@ -48,8 +48,7 @@ public:
     //-----------------------------------------------------------------
     // Instances / Members
     //-----------------------------------------------------------------      
-    //riscv_tcm_top_rtl *m_dut; // Pointing to DUT (Design Under Test)
-    //TODO:Test this approach
+    // Pointing to DUT (Design Under Test)
     std::unique_ptr<riscv_tcm_top_rtl> m_dut; 
 
     int                          m_argc;
@@ -143,21 +142,8 @@ public:
         init_dut(); 
     }
 
-    /*
-    The m_dut variable is now a class variable for 
-    subsequent memory access via the `rootp` mechanism.
-    The functions will be represented as follows in 
-    the “Vriscv_tcm_top_tcm_mem.h” file
-    
-    // INTERNAL METHODS
-    void __Vconfigure(bool first);
-    uint32_t read(uint32_t addr);
-    bool write(uint32_t addr, uint32_t data);
-    */
-
     void init_dut() {
         m_dut = std::make_unique<riscv_tcm_top_rtl>("DUT");
-        //m_dut = new riscv_tcm_top_rtl("DUT");
         m_dut->clk_in(clk);
         m_dut->rst_in(rst);
         m_dut->rst_cpu_in(rst_cpu_in);
@@ -167,11 +153,6 @@ public:
         m_dut->axi_i_in(axi_i_in);
         m_dut->intr_in(intr_in);
     }
-    /* 
-    Tracing of design work must now be enabled separately,
-    so that it is possible to preset the system settings. 
-    Otherwise, we get an error.
-    */
 
     //Enabling the design tracer
     void enable_verilator_trace() {
@@ -211,7 +192,7 @@ public:
     void write(uint32_t addr, uint8_t data)
     {
         std::cout << "Write memory" << std::endl;
-#ifdef DEBUG_TCM
+#ifdef PRINT_TCM
         static size_t count = 0;
         std::cout << "Addr: " << std::hex << addr 
                     << "Data: " << std::setw(2) << std::setfill('0') 
@@ -234,7 +215,7 @@ public:
                     << (int)readData << std::endl;
         return readData;
 #endif
-#ifndef DEBUG_TCM
+#ifndef PRINT_TCM
         return m_dut->m_rtl->v->u_tcm->read(addr);
 #endif
     }
