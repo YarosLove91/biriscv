@@ -2,6 +2,7 @@
 #include "elf_load.h"
 #include <getopt.h>
 #include <unistd.h>
+#include <iomanip>
 
 #include "riscv_top.h"
 #include "tb_axi4_mem.h"
@@ -10,6 +11,7 @@
 #include "verilated_vcd_sc.h"
 
 #define MEM_BASE 0x80000000
+#define DEBUG_MEM
 
 //-----------------------------------------------------------------
 // Command line options
@@ -127,6 +129,7 @@ public:
     testbench(sc_module_name name): testbench_vbase(name)
     {
         m_dut = new riscv_top("DUT");
+
         m_dut->clk_in(clk);
         m_dut->rst_in(rst);
         m_dut->axi_i_out(mem_i_out);
@@ -149,8 +152,11 @@ public:
         m_dcache_mem->rst_in(rst);
         m_dcache_mem->axi_in(mem_d_out);
         m_dcache_mem->axi_out(mem_d_in);
-		
-		verilator_trace_enable("verilator.vcd", m_dut);
+    }
+
+    //Enabling the design tracer
+    void enable_verilator_trace() {
+        verilator_trace_enable("verilator.vcd", m_dut);
     }
     //-----------------------------------------------------------------
     // Trace
