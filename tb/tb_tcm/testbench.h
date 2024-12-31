@@ -137,12 +137,8 @@ public:
     // Construction
     //-----------------------------------------------------------------
     SC_HAS_PROCESS(testbench);
-    testbench(sc_module_name name) : testbench_vbase(name), m_dut(nullptr) // DUT pointer initialize
+    testbench(sc_module_name name) : testbench_vbase(name) // DUT pointer initialize
     {
-        init_dut(); 
-    }
-
-    void init_dut() {
         m_dut = std::make_unique<riscv_tcm_top_rtl>("DUT");
         m_dut->clk_in(clk);
         m_dut->rst_in(rst);

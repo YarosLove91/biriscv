@@ -6,9 +6,6 @@
 #include "verilated_vcd_c.h"
 #endif
 
-
-    // const std::unique_ptr<Vriscv_tcm_top_tcm_mem> top{new Vriscv_tcm_top_tcm_mem{contextp.get(), "TCM_MemoryModule"}};
-    // std::unique_ptr<Vriscv_tcm_top_tcm_mem> top = std::make_unique<Vriscv_tcm_top_tcm_mem>(contextp.get(), "MyMemoryModule");
 //-------------------------------------------------------------
 // Constructor
 //-------------------------------------------------------------
@@ -94,12 +91,13 @@ riscv_tcm_top_rtl::riscv_tcm_top_rtl(sc_module_name name): sc_module(name)
     sensitive << m_axi_t_rlast_out;
 
 #if VM_TRACE
-    m_vcd         = NULL;
+    m_vcd.reset(); // Используем reset для инициализации unique_ptr
     m_delay_waves = false;
     SC_METHOD(trace_rtl);
     sensitive << clk_in;
 #endif
 }
+
 //-------------------------------------------------------------
 // trace_rtl
 //-------------------------------------------------------------
@@ -118,25 +116,28 @@ void riscv_tcm_top_rtl::trace_rtl(void)
         m_vcd->dump((int)(sc_time_stamp().to_double()));
 #endif
 }
+
 //-------------------------------------------------------------
 // trace_enable
 //-------------------------------------------------------------
 void riscv_tcm_top_rtl::trace_enable(VerilatedVcdC * p)
 {
 #if VM_TRACE
-    m_vcd = p;
-    m_rtl->trace (m_vcd, 99);
+    m_vcd.reset(p); // Используем reset для установки нового указателя
+    m_rtl->trace(m_vcd.get(), 99); // Передаем указатель
 #endif
 }
+
 void riscv_tcm_top_rtl::trace_enable(VerilatedVcdC *p, sc_core::sc_time start_time)
 {
 #if VM_TRACE
-    m_vcd = p;
+    m_vcd.reset(p); // Используем reset для установки нового указателя
     m_delay_waves = true;
     m_waves_start = start_time;
-    m_rtl->trace (m_vcd, 99);
+    m_rtl->trace(m_vcd.get(), 99); // Передаем указатель
 #endif
 }
+
 //-------------------------------------------------------------
 // async_outputs
 //-------------------------------------------------------------
@@ -157,7 +158,6 @@ void riscv_tcm_top_rtl::async_outputs(void)
     m_axi_i_rdata_in.write(axi_i_i.RDATA); 
     m_axi_i_rresp_in.write(axi_i_i.RRESP); 
 
-
     axi4_lite_master axi_i_o;
     axi_i_o.AWVALID = m_axi_i_awvalid_out.read(); 
     axi_i_o.AWADDR = m_axi_i_awaddr_out.read(); 
@@ -169,6 +169,7 @@ void riscv_tcm_top_rtl::async_outputs(void)
     axi_i_o.ARADDR = m_axi_i_araddr_out.read(); 
     axi_i_o.RREADY = m_axi_i_rready_out.read(); 
     axi_i_out.write(axi_i_o);
+    
     axi4_master axi_t_i = axi_t_in.read();
     m_axi_t_awvalid_in.write(axi_t_i.AWVALID); 
     m_axi_t_awaddr_in.write(axi_t_i.AWADDR); 
@@ -187,7 +188,6 @@ void riscv_tcm_top_rtl::async_outputs(void)
     m_axi_t_arburst_in.write(axi_t_i.ARBURST); 
     m_axi_t_rready_in.write(axi_t_i.RREADY); 
 
-
     axi4_slave axi_t_o;
     axi_t_o.AWREADY = m_axi_t_awready_out.read(); 
     axi_t_o.WREADY = m_axi_t_wready_out.read(); 
@@ -201,5 +201,4 @@ void riscv_tcm_top_rtl::async_outputs(void)
     axi_t_o.RID = m_axi_t_rid_out.read(); 
     axi_t_o.RLAST = m_axi_t_rlast_out.read(); 
     axi_t_out.write(axi_t_o);
-
 }

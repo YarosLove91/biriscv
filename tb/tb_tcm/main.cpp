@@ -55,6 +55,7 @@ static void assert_handler(const sc_report& rep, const sc_actions& actions)
 static void exit_override(void)
 {
     if (tb)
+    std::cerr << "\033[31mFailure abort!\n\033[0m" << std::endl;
         tb->abort();
 }
 //--------------------------------------------------------------------
@@ -62,8 +63,9 @@ static void exit_override(void)
 //--------------------------------------------------------------------
 void vl_finish (const char* filename, int linenum, const char* hier)
 { 
+    std::cerr << "\033[32mExit success!\n\033[0m" << std::endl;
     // Jump to exit handler!
-    exit(0);    
+    exit(EXIT_SUCCESS);    
 }
 //-----------------------------------------------------------------
 // sigint_handler
@@ -71,9 +73,9 @@ void vl_finish (const char* filename, int linenum, const char* hier)
 static void sigint_handler(int s)
 {
     exit_override();
-
+    std::cerr << "\033[31mExit failure!\n\033[0m" << std::endl;
     // Jump to exit handler!
-    exit(1);
+    exit(EXIT_FAILURE);
 }
 //--------------------------------------------------------------------
 // sc_main
@@ -140,7 +142,8 @@ int sc_main(int argc, char* argv[])
                  clk0_rst.clk(CLK0_NAME);
 
     // Testbench
-    tb = new testbench("tb");
+    
+    std::unique_ptr<testbench> tb = std::make_unique<testbench>("tb");
     tb->CLK0_NAME(CLK0_NAME);
     tb->RST0_NAME(clk0_rst.rst);
 

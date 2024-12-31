@@ -4,7 +4,7 @@
 #include <systemc.h>
 #include <verilated.h>
 
-// For std::unique_ptr
+// Для std::unique_ptr
 #include <memory>
 
 #include "axi4_lite.h"
@@ -119,7 +119,7 @@ public:
     std::unique_ptr<Vriscv_tcm_top> m_rtl;
     
 #if VM_TRACE
-    VerilatedVcdC  * m_vcd;
+    std::unique_ptr<VerilatedVcdC> m_vcd; // Измените здесь
     bool             m_delay_waves;
     sc_core::sc_time m_waves_start;
 #endif 
