@@ -42,10 +42,10 @@ class testbench: public testbench_vbase, public mem_api
 public:
     //-----------------------------------------------------------------
     // Instances / Members
-    //-----------------------------------------------------------------      
+    //-----------------------------------------------------------------
     riscv_top                   *m_dut;
-    tb_axi4_mem                 *m_icache_mem;
-    tb_axi4_mem                 *m_dcache_mem;
+    std::unique_ptr<tb_axi4_mem> m_icache_mem;
+    std::unique_ptr<tb_axi4_mem> m_dcache_mem;
 
     int                          m_argc;
     char**                       m_argv;
@@ -140,14 +140,14 @@ public:
         m_dut->reset_vector_in(reset_vector_in);
 
         // Instruction Cache Memory
-        m_icache_mem = new tb_axi4_mem("ICACHE_MEM");
+        m_icache_mem = std::make_unique<tb_axi4_mem>("ICACHE_MEM"); // Изменено на make_unique
         m_icache_mem->clk_in(clk);
         m_icache_mem->rst_in(rst);
         m_icache_mem->axi_in(mem_i_out);
         m_icache_mem->axi_out(mem_i_in);
 
         // Data Cache Memory
-        m_dcache_mem = new tb_axi4_mem("DCACHE_MEM");
+        m_dcache_mem = std::make_unique<tb_axi4_mem>("DCACHE_MEM"); // Изменено на make_unique
         m_dcache_mem->clk_in(clk);
         m_dcache_mem->rst_in(rst);
         m_dcache_mem->axi_in(mem_d_out);
