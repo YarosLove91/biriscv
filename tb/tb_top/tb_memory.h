@@ -3,6 +3,8 @@
 
 #include <systemc.h>
 #include <queue>
+#include <memory>
+#include <vector>
 
 #define TB_MEM_MAX_REGIONS    10
 
@@ -12,13 +14,15 @@
 class tb_mem_region
 {
 public:
-    tb_mem_region(uint32_t base, uint32_t size, uint8_t *pMem = NULL)
+    tb_mem_region(uint32_t base, uint32_t size, uint8_t *pMem = nullptr)
     {
         m_base    = base;
         m_size    = size;
         m_mem     = pMem ? pMem : new uint8_t[size];
         m_trace   = false;
     }
+
+    //TODO:Finalize the tb_mem_region function using the smart pointer
 
     uint32_t get_base(void) { return m_base; }
     uint32_t get_size(void) { return m_size; }
@@ -90,7 +94,7 @@ public:
     tb_memory()
     {
         for (int i=0;i<TB_MEM_MAX_REGIONS;i++)
-            m_mem[i] = NULL;
+            m_mem[i] = nullptr;
 
         m_record_accesses = false;
     }
@@ -100,7 +104,7 @@ public:
         for (int i=0;i<TB_MEM_MAX_REGIONS;i++)
             if (!m_mem[i])
             {
-                m_mem[i] = new tb_mem_region(base, size);
+                m_mem[i] = std::make_unique<tb_mem_region>(base, size);
                 return true;
             }
             // Detect overlapping regions
@@ -114,7 +118,7 @@ public:
         for (int i=0;i<TB_MEM_MAX_REGIONS;i++)
             if (!m_mem[i])
             {
-                m_mem[i] = new tb_mem_region(base, size, mem);
+                m_mem[i] = std::make_unique<tb_mem_region>(base, size, mem);
                 return true;
             }
             // Detect overlapping regions
@@ -184,7 +188,7 @@ public:
 
         printf("ERROR: Access out of range 0x%08x\n", addr);
         sc_assert(0);
-        return NULL;
+        return nullptr;
     }
 
     void          records_enable(bool enable) { m_record_accesses = enable; }
@@ -192,7 +196,7 @@ public:
     tb_mem_record records_pop(void)           { tb_mem_record v = m_accesses.front(); m_accesses.pop(); return v; }
 
 protected:
-    tb_mem_region *            m_mem[TB_MEM_MAX_REGIONS];
+    std::unique_ptr<tb_mem_region> m_mem[TB_MEM_MAX_REGIONS]; // Использование unique_ptr
     bool                       m_record_accesses;
     std::queue <tb_mem_record> m_accesses;
 };
