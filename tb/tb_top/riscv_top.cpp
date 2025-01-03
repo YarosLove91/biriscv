@@ -1,4 +1,3 @@
-
 #include "riscv_top.h"
 #include "Vriscv_top.h"
 
@@ -113,7 +112,7 @@ riscv_top::riscv_top(sc_module_name name): sc_module(name)
     sensitive << m_axi_d_rready_out;
 
 #if VM_TRACE
-    m_vcd         = nullptr; // Используйте nullptr вместо NULL
+    m_vcd = nullptr;
     m_delay_waves = false;
 #endif
 }
@@ -123,20 +122,21 @@ riscv_top::riscv_top(sc_module_name name): sc_module(name)
 void riscv_top::trace_enable(VerilatedVcdC * p)
 {
 #if VM_TRACE
-    m_vcd = p;
-    m_rtl->trace(m_vcd, 99);
+    m_vcd = std::unique_ptr<VerilatedVcdC>(p); // Устанавливаем умный указатель
+    m_rtl->trace(m_vcd.get(), 99); // Используем get() для получения сырого указателя
 #endif
 }
 
 void riscv_top::trace_enable(VerilatedVcdC *p, sc_core::sc_time start_time)
 {
 #if VM_TRACE
-    m_vcd = p;
+    m_vcd = std::unique_ptr<VerilatedVcdC>(p); // Устанавливаем умный указатель
     m_delay_waves = true;
     m_waves_start = start_time;
-    m_rtl->trace(m_vcd, 99);
+    m_rtl->trace(m_vcd.get(), 99); // Используем get() для получения сырого указателя
 #endif
 }
+
 //-------------------------------------------------------------
 // async_outputs
 //-------------------------------------------------------------
