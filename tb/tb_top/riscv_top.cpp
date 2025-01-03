@@ -12,7 +12,7 @@
 //-------------------------------------------------------------
 riscv_top::riscv_top(sc_module_name name): sc_module(name)
 {
-    m_rtl = new Vriscv_top("Vriscv_top");
+    m_rtl = std::make_unique<Vriscv_top>("Vriscv_top");
     m_rtl->clk_i(m_clk_in);
     m_rtl->rst_i(m_rst_in);
     m_rtl->axi_i_awready_i(m_axi_i_awready_in);
@@ -113,7 +113,7 @@ riscv_top::riscv_top(sc_module_name name): sc_module(name)
     sensitive << m_axi_d_rready_out;
 
 #if VM_TRACE
-    m_vcd         = NULL;
+    m_vcd         = nullptr; // Используйте nullptr вместо NULL
     m_delay_waves = false;
 #endif
 }
@@ -124,16 +124,17 @@ void riscv_top::trace_enable(VerilatedVcdC * p)
 {
 #if VM_TRACE
     m_vcd = p;
-    m_rtl->trace (m_vcd, 99);
+    m_rtl->trace(m_vcd, 99);
 #endif
 }
+
 void riscv_top::trace_enable(VerilatedVcdC *p, sc_core::sc_time start_time)
 {
 #if VM_TRACE
     m_vcd = p;
     m_delay_waves = true;
     m_waves_start = start_time;
-    m_rtl->trace (m_vcd, 99);
+    m_rtl->trace(m_vcd, 99);
 #endif
 }
 //-------------------------------------------------------------

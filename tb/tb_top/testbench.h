@@ -156,7 +156,7 @@ public:
 
     //Enabling the design tracer
     void enable_verilator_trace() {
-        verilator_trace_enable("verilator.vcd", m_dut);
+        verilator_trace_enable("verilator.vcd", this-> m_dut);
     }
     //-----------------------------------------------------------------
     // Trace
