@@ -9,14 +9,14 @@
         if (waves_enabled()) \
         { \
             Verilated::traceEverOn(true); \
-            VerilatedVcdC *v_vcd = new VerilatedVcdC; \
+            auto v_vcd = std::make_unique<VerilatedVcdC>(); \
             sc_core::sc_time delay_us; \
             if (waves_delayed(delay_us)) \
-                dut->trace_enable (v_vcd, delay_us); \
+                dut->trace_enable(v_vcd.get(), delay_us); \
             else \
-                dut->trace_enable (v_vcd); \
-            v_vcd->open (vcd_filename); \
-            this->m_verilate_vcd = v_vcd; \
+                dut->trace_enable(v_vcd.get()); \
+            v_vcd->open(vcd_filename); \
+            this->m_verilate_vcd = std::move(v_vcd); \
         }
 
 //-----------------------------------------------------------------
@@ -37,7 +37,7 @@ public:
     virtual void monitor(void) { while (1) wait(); }
 
     SC_HAS_PROCESS(testbench_vbase);
-    testbench_vbase(sc_module_name name): sc_module(name)
+    testbench_vbase(sc_module_name name): sc_module(name), m_verilate_vcd(nullptr) // Инициализация
     {    
         SC_CTHREAD(process, clk);
         SC_CTHREAD(monitor, clk);
@@ -52,7 +52,7 @@ public:
         {
             m_verilate_vcd->flush();
             m_verilate_vcd->close();
-            m_verilate_vcd = NULL;
+            m_verilate_vcd.reset(); // Установка в nullptr
         }
     }
 
@@ -89,7 +89,7 @@ public:
     }
 
 protected:
-    VerilatedVcdC   *m_verilate_vcd;
+    std::unique_ptr<VerilatedVcdC> m_verilate_vcd; // Использование unique_ptr
 };
 
 #endif
