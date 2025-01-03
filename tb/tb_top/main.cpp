@@ -4,6 +4,8 @@
 #include <math.h>
 #include <signal.h>
 
+#include "memory"
+
 //--------------------------------------------------------------------
 // Defines
 //--------------------------------------------------------------------
@@ -32,7 +34,7 @@
 //--------------------------------------------------------------------
 // Locals
 //--------------------------------------------------------------------
-static testbench *tb = NULL;
+static std::unique_ptr<testbench> tb;
 
 //--------------------------------------------------------------------
 // assert_handler: Handling of sc_assert
@@ -142,7 +144,7 @@ int sc_main(int argc, char* argv[])
                  clk0_rst.clk(CLK0_NAME);
 
     // Testbench
-    tb = new testbench("tb");
+    tb = std::make_unique<testbench>("tb"); // Создание уникального указателя
     tb->CLK0_NAME(CLK0_NAME);
     tb->RST0_NAME(clk0_rst.rst);
 
