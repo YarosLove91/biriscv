@@ -4,6 +4,8 @@
 #include <math.h>
 #include <signal.h>
 
+#include "memory"
+
 //--------------------------------------------------------------------
 // Defines
 //--------------------------------------------------------------------
@@ -62,8 +64,12 @@ static void exit_override(void)
 //--------------------------------------------------------------------
 void vl_finish (const char* filename, int linenum, const char* hier)
 { 
+    std::cout << "\033[32m\nExit success!\n\033[0m \n"
+        << "Filename is\t" << filename 
+        << "\tlinenum is:\t" << linenum 
+        << "\thier is \t" << hier << endl;
     // Jump to exit handler!
-    exit(0);    
+    exit(EXIT_SUCCESS);    
 }
 //-----------------------------------------------------------------
 // sigint_handler
@@ -71,9 +77,9 @@ void vl_finish (const char* filename, int linenum, const char* hier)
 static void sigint_handler(int s)
 {
     exit_override();
-
+    std::cout << "\033[31m\nExit failure!\n\033[0m Code erros is:\t" << s << std::endl;
     // Jump to exit handler!
-    exit(1);
+    exit(EXIT_FAILURE);
 }
 //--------------------------------------------------------------------
 // sc_main
@@ -143,15 +149,18 @@ int sc_main(int argc, char* argv[])
     tb = new testbench("tb");
     tb->CLK0_NAME(CLK0_NAME);
     tb->RST0_NAME(clk0_rst.rst);
-
+    // The start time of the simulation must be specified
+    sc_core::sc_start(SC_ZERO_TIME);
     // Waves
     if (trace)
         tb->add_trace(sc_create_vcd_trace_file(vcd_name), "");
 
     tb->set_argcv(argc - last_argc, &argv[last_argc]);
-
+    // Detached from the `tb = new testbench(“tb”)` 
+    // constructor, we enable tracing in `.vcd` 
+    tb->verilator_trace_enable("Verilator.vcd");
     // Go!
-    sc_start();
+    sc_core::sc_start();
 
     return 0;
 }
