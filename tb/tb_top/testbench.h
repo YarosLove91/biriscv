@@ -163,11 +163,21 @@ public:
 
             sc_core::sc_time delay_us; 
             
-            if (waves_delayed(delay_us)) 
-                m_dut->trace_enable (v_vcd, delay_us); 
-            else m_dut->trace_enable (v_vcd); 
+            if (waves_delayed(delay_us)) {
+                std::cout << "Waves delayed \n" << std::endl;
+                m_dut->trace_enable (v_vcd, delay_us);
+            }
+            else {
+                std::cout << "Wats without delayed\n" << std::endl;
+                m_dut->trace_enable (v_vcd); 
+            }
             
-            v_vcd->open (vcdName); 
+            v_vcd->open ("vcdName"); 
+
+            if (v_vcd->isOpen())
+                std::cout << "v_vcd is open\n" << std::endl;
+            std::cout << "v_vcd is SHIT!\n" << std::endl;
+            
             this->m_verilate_vcd = v_vcd; 
             }
     }

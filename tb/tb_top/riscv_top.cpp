@@ -133,7 +133,7 @@ void riscv_top::trace_enable(VerilatedVcdC *p, sc_core::sc_time start_time)
     m_vcd = p;
     m_delay_waves = true;
     m_waves_start = start_time;
-    //m_rtl->trace (m_vcd, 99);
+    m_rtl->trace (m_vcd, 99);
 #endif
 }
 //-------------------------------------------------------------
