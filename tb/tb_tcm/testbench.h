@@ -148,8 +148,27 @@ public:
         m_dut->axi_i_out(axi_i_out);
         m_dut->axi_i_in(axi_i_in);
         m_dut->intr_in(intr_in);
-		
-		verilator_trace_enable("verilator.vcd", m_dut);
+    }
+    
+    //Enabling the design tracer
+    inline void verilator_trace_enable(const char* vcdName) {
+        if (waves_enabled()) { 
+            Verilated::traceEverOn(true); 
+            VerilatedVcdC *v_vcd = new VerilatedVcdC; 
+
+            if (!v_vcd) {
+                throw std::runtime_error("Failed to allocate memory for VerilatedVcdC");
+            }
+
+            sc_core::sc_time delay_us; 
+            
+            if (waves_delayed(delay_us)) 
+                m_dut->trace_enable (v_vcd, delay_us); 
+            else m_dut->trace_enable (v_vcd); 
+            
+            v_vcd->open (vcdName); 
+            this->m_verilate_vcd = v_vcd; 
+            }
     }
     //-----------------------------------------------------------------
     // Trace
