@@ -111,7 +111,7 @@ private:
     sc_signal <bool> m_axi_t_rlast_out;
 
 public:
-    Vriscv_tcm_top *m_rtl;
+    std::unique_ptr<Vriscv_tcm_top> m_rtl;
 #if VM_TRACE
     VerilatedVcdC  * m_vcd;
     bool             m_delay_waves;
