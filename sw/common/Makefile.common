@@ -1,0 +1,33 @@
+rv32c   ?= 0
+tcm     ?= 0
+CROSS_COMPILE := riscv64-unknown-elf-
+
+CC      := $(CROSS_COMPILE)gcc
+AS      := $(CROSS_COMPILE)as
+AR      := $(CROSS_COMPILE)ar
+OBJDUMP := $(CROSS_COMPILE)objdump
+OBJCOPY := $(CROSS_COMPILE)objcopy
+READELF := $(CROSS_COMPILE)readelf
+
+ifeq ($(rv32c), 1)
+ARCH    := -march=rv32imac -mabi=ilp32
+else
+ARCH    := -march=rv32im_zicsr -mabi=ilp32
+endif
+
+ifeq ($(tcm), 0)
+LINKSCR := default.ld
+else
+LINKSCR := tcm.ld
+endif
+
+CFLAGS  := -O2 -Wall $(ARCH) -nostartfiles -nostdlib
+CFLAGS  += -fno-common -funroll-loops -finline-functions -falign-functions=16
+CFLAGS  += -falign-jumps=4 -falign-loops=4 -finline-limit=1000
+CFLAGS  += -fno-if-conversion2 -fselective-scheduling -fno-tree-dominator-opts
+CFLAGS  += -fno-reg-struct-return -fno-rename-registers
+CFLAGS  += --param case-values-threshold=8 -fno-crossjumping
+CFLAGS  += -freorder-blocks-and-partition -fno-tree-loop-if-convert
+CFLAGS  += -fno-tree-sink -fgcse-sm -fno-strict-overflow
+ASFLAGS := $(ARCH)
+LDFLAGS := -lc -lm -lgcc -lsys
