@@ -149,9 +149,30 @@ public:
         m_dcache_mem->rst_in(rst);
         m_dcache_mem->axi_in(mem_d_out);
         m_dcache_mem->axi_out(mem_d_in);
-		
-		verilator_trace_enable("verilator.vcd", m_dut);
     }
+
+    //Enabling the design tracer
+    inline void verilator_trace_enable(const char* vcdName) {
+        if (waves_enabled()) { 
+            Verilated::traceEverOn(true); 
+            VerilatedVcdC *v_vcd = new VerilatedVcdC; 
+
+            if (!v_vcd) {
+                throw std::runtime_error("Failed to allocate memory for VerilatedVcdC");
+            }
+
+            sc_core::sc_time delay_us; 
+            
+            if (waves_delayed(delay_us)) 
+                m_dut->trace_enable (v_vcd, delay_us); 
+            else m_dut->trace_enable (v_vcd); 
+            
+            v_vcd->open (vcdName); 
+            this->m_verilate_vcd = v_vcd; 
+            }
+    }
+
+
     //-----------------------------------------------------------------
     // Trace
     //-----------------------------------------------------------------
