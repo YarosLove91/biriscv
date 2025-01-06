@@ -49,7 +49,7 @@ public:
     //-----------------------------------------------------------------
     // Instances / Members
     //-----------------------------------------------------------------      
-    riscv_tcm_top_rtl           *m_dut;
+    std::unique_ptr<riscv_tcm_top_rtl> m_dut;
 
     int                          m_argc;
     char**                       m_argv;
@@ -139,7 +139,7 @@ public:
     SC_HAS_PROCESS(testbench);
     testbench(sc_module_name name): testbench_vbase(name)
     {
-        m_dut = new riscv_tcm_top_rtl("DUT");
+        m_dut = std::make_unique<riscv_tcm_top_rtl>("DUT");
         m_dut->clk_in(clk);
         m_dut->rst_in(rst);
         m_dut->rst_cpu_in(rst_cpu_in);
