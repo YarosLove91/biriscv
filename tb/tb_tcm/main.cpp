@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <signal.h>
+#include <memory> // Для std::unique_ptr
 
 #include "memory"
 
@@ -34,7 +35,8 @@
 //--------------------------------------------------------------------
 // Locals
 //--------------------------------------------------------------------
-static testbench *tb = NULL;
+//static testbench *tb = NULL;
+std::unique_ptr<testbench> tb;
 
 //--------------------------------------------------------------------
 // assert_handler: Handling of sc_assert
@@ -146,7 +148,9 @@ int sc_main(int argc, char* argv[])
                  clk0_rst.clk(CLK0_NAME);
 
     // Testbench
-    tb = new testbench("tb");
+    //tb = new testbench("tb");
+    //TODO: 
+    std::unique_ptr<testbench> tb = std::make_unique<testbench>("tb");
     tb->CLK0_NAME(CLK0_NAME);
     tb->RST0_NAME(clk0_rst.rst);
     // The start time of the simulation must be specified

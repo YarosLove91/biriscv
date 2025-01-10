@@ -113,7 +113,8 @@ private:
 public:
     std::unique_ptr<Vriscv_tcm_top> m_rtl;
 #if VM_TRACE
-    VerilatedVcdC  * m_vcd;
+    //VerilatedVcdC  *m_vcd;
+    std::unique_ptr<VerilatedVcdC>  m_vcd;
     bool             m_delay_waves;
     sc_core::sc_time m_waves_start;
 #endif 

@@ -154,7 +154,8 @@ public:
     inline void verilator_trace_enable(const char* vcdName) {
         if (waves_enabled()) { 
             Verilated::traceEverOn(true); 
-            VerilatedVcdC *v_vcd = new VerilatedVcdC; 
+            //VerilatedVcdC *v_vcd = new VerilatedVcdC; 
+            std::unique_ptr<VerilatedVcdC> v_vcd = std::make_unique<VerilatedVcdC>(); 
 
             if (!v_vcd) {
                 throw std::runtime_error("Failed to allocate memory for VerilatedVcdC");
@@ -163,11 +164,12 @@ public:
             sc_core::sc_time delay_us; 
             
             if (waves_delayed(delay_us)) 
-                m_dut->trace_enable (v_vcd, delay_us); 
-            else m_dut->trace_enable (v_vcd); 
+                m_dut->trace_enable(v_vcd.get(), delay_us);
+            else m_dut->trace_enable(v_vcd.get()); 
             
             v_vcd->open (vcdName); 
-            this->m_verilate_vcd = v_vcd; 
+            // this->m_verilate_vcd = v_vcd; 
+            m_verilate_vcd = std::move(v_vcd); 
             }
     }
     //-----------------------------------------------------------------
