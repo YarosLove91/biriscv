@@ -34,6 +34,7 @@ public:
     virtual void abort(void)
     {
         cout << "TB: Aborted at " << sc_time_stamp() << endl;
+        cout << "end adddr is:\t" << m_verilate_vcd << endl;
         if (m_verilate_vcd)
         {
             m_verilate_vcd->flush();

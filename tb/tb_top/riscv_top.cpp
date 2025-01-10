@@ -123,13 +123,16 @@ riscv_top::riscv_top(sc_module_name name): sc_module(name)
 void riscv_top::trace_enable(VerilatedVcdC * p)
 {
 #if VM_TRACE
+    DEBUG_PRINT("Trace enable without start_time");
     m_vcd = p;
+    cout << "p is\t" << p << endl;
     m_rtl->trace (m_vcd, 99);
 #endif
 }
 void riscv_top::trace_enable(VerilatedVcdC *p, sc_core::sc_time start_time)
 {
 #if VM_TRACE
+    DEBUG_PRINT("Trace enable with start_time");
     m_vcd = p;
     m_delay_waves = true;
     m_waves_start = start_time;

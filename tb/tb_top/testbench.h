@@ -9,6 +9,12 @@
 #include "verilated.h"
 #include "verilated_vcd_sc.h"
 
+#include "debug_macro.h"
+
+#define LOGGING_ENABLED
+#define DEBUG
+#define DEBUG_ARG
+
 #define MEM_BASE 0x80000000
 
 //-----------------------------------------------------------------
@@ -154,31 +160,37 @@ public:
     //Enabling the design tracer
     inline void verilator_trace_enable(const char* vcdName) {
         if (waves_enabled()) { 
+
             Verilated::traceEverOn(true); 
             VerilatedVcdC *v_vcd = new VerilatedVcdC; 
 
+
+            cout << "v_vcd addr is\t" << v_vcd << endl;
             if (!v_vcd) {
                 throw std::runtime_error("Failed to allocate memory for VerilatedVcdC");
             }
 
-            sc_core::sc_time delay_us; 
+            // sc_core::sc_time delay_us;// (1, sc_core::SC_NS); sc_time_unit
+            sc_core::sc_time delay_us (sc_core::sc_time_unit::SC_PS); 
+            
             
             if (waves_delayed(delay_us)) {
-                std::cout << "Waves delayed \n" << std::endl;
-                m_dut->trace_enable (v_vcd, delay_us);
+                DEBUG_PRINT("Waves delayed \n");
+                this->m_dut->trace_enable (v_vcd, delay_us);
             }
             else {
-                std::cout << "Wats without delayed\n" << std::endl;
-                m_dut->trace_enable (v_vcd); 
+                DEBUG_PRINT("Waves without delayed\n");
+                this->m_dut->trace_enable (v_vcd); 
             }
             
-            v_vcd->open ("vcdName"); 
+            v_vcd->open (vcdName); 
 
-            if (v_vcd->isOpen())
-                std::cout << "v_vcd is open\n" << std::endl;
-            std::cout << "v_vcd is SHIT!\n" << std::endl;
-            
-            this->m_verilate_vcd = v_vcd; 
+            if (v_vcd->isOpen()){
+                DEBUG_PRINT("v_vcd suseccfull open!\n");
+            }else{
+                throw std::runtime_error("Failed to open V_VCD");
+            }
+                this->m_verilate_vcd = v_vcd; 
             }
     }
 
@@ -190,12 +202,12 @@ public:
     {
         if (!waves_enabled())
             return;
-
         // Add signals to trace file
         #define TRACE_SIGNAL(a) sc_trace(fp,a,#a);
         TRACE_SIGNAL(clk);
         TRACE_SIGNAL(rst);
 
+        DEBUG_PRINT_ARG("Waves enabled!", fp, 0);
         m_dut->add_trace(fp, "");
     }
 

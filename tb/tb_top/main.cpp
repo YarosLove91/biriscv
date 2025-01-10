@@ -4,6 +4,7 @@
 #include <math.h>
 #include <signal.h>
 
+#include <memory>
 //--------------------------------------------------------------------
 // Defines
 //--------------------------------------------------------------------
@@ -32,7 +33,7 @@
 //--------------------------------------------------------------------
 // Locals
 //--------------------------------------------------------------------
-static testbench *tb = NULL;
+static std::unique_ptr<testbench> tb;
 
 //--------------------------------------------------------------------
 // assert_handler: Handling of sc_assert
@@ -89,6 +90,13 @@ int sc_main(int argc, char* argv[])
     int last_argc         = 0;
     const char * vcd_name = "sysc_wave";
 
+    // Вывод всех аргументов
+    std::cout << "Arguments passed to main:" << std::endl;
+    for (int i = 0; i < argc; i++)
+    {
+        std::cout << "argv[" << i << "]: " << argv[i] << std::endl;
+    }
+
     // Env variable seed override
     char *s = getenv("SEED");
     if (s && strcmp(s, ""))
@@ -118,6 +126,10 @@ int sc_main(int argc, char* argv[])
         }
     }
 
+    std::cout << "Trace: " << trace << std::endl;
+    std::cout << "Seed: " << seed << std::endl;
+    std::cout << "VCD Name: " << vcd_name << std::endl;
+
     // Enable waves override
     s = getenv("ENABLE_WAVES");
     if (s && !strcmp(s, "no"))
@@ -144,7 +156,7 @@ int sc_main(int argc, char* argv[])
                  clk0_rst.clk(CLK0_NAME);
 
     // Testbench
-    tb = new testbench("tb");
+    tb = std::make_unique<testbench>("tb");
     tb->CLK0_NAME(CLK0_NAME);
     tb->RST0_NAME(clk0_rst.rst);
     // The start time of the simulation must be specified
@@ -159,7 +171,7 @@ int sc_main(int argc, char* argv[])
     
     //TODO:Tracing does not work in this design !
     //A new branch `tb_top_trace_fix` has been created to solve the problem.
-    //tb->verilator_trace_enable("Verilator.vcd");
+    tb->verilator_trace_enable("Verilator.vcd");
     // Go!
     sc_core::sc_start();
 

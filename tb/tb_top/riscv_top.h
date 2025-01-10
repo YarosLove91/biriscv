@@ -6,6 +6,9 @@
 #include "axi4.h"
 #include "axi4.h"
 
+#define DEBUG
+#include "debug_macro.h"
+
 class Vriscv_top;
 class VerilatedVcdC;
 
