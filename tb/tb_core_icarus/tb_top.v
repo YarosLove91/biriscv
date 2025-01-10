@@ -1,5 +1,7 @@
 module tb_top;
 
+`define trace_gate_level_simulation
+
 reg clk;
 reg rst;
 
@@ -133,5 +135,23 @@ u_mem
     ,.mem_d_error_o(mem_d_error_w)
     ,.mem_d_resp_tag_o(mem_d_resp_tag_w)
 );
+
+`ifdef trace_gate_level_simulation
+
+biriscv_trace_sim_gls
+trace_inst_0
+(
+     .valid_i(1'b1)
+    ,.opcode_i(mem_i_inst_w[31:0])
+);
+
+biriscv_trace_sim_gls
+trace_inst_1
+(
+     .valid_i(1'b1)
+    ,.opcode_i(mem_i_inst_w[63:32])
+);
+
+`endif
 
 endmodule
