@@ -19,8 +19,8 @@ public:
     virtual void set_iterations(int iterations) { }
     virtual void set_argcv(int argc, char* argv[]) { }
 
-    virtual void process(void) { while (1) wait(); }
-    virtual void monitor(void) { while (1) wait(); }
+    virtual void process(void) { while (true) wait(); }
+    virtual void monitor(void) { while (true) wait(); }
 
     SC_HAS_PROCESS(testbench_vbase);
     testbench_vbase(sc_module_name name): sc_module(name)
@@ -33,7 +33,7 @@ public:
 
     virtual void abort(void)
     {
-        cout << "TB: Aborted at " << sc_time_stamp() << endl;
+        std::cout << "TB: Aborted at " << sc_time_stamp() << std::endl;
         if (m_verilate_vcd)
         {
             m_verilate_vcd->flush();
@@ -75,7 +75,7 @@ public:
     }
 
 protected:
-    VerilatedVcdC   *m_verilate_vcd;
+    std::unique_ptr<VerilatedVcdC> m_verilate_vcd ;
 };
 
 #endif

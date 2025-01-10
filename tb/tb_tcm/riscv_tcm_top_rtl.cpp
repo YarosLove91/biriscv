@@ -120,17 +120,17 @@ void riscv_tcm_top_rtl::trace_rtl(void)
 void riscv_tcm_top_rtl::trace_enable(VerilatedVcdC * p)
 {
 #if VM_TRACE
-    m_vcd = p;
-    m_rtl->trace (m_vcd, 99);
+    m_vcd.reset(p); // Устанавливаем новый указатель
+    m_rtl->trace (m_vcd.get(), 99);
 #endif
 }
 void riscv_tcm_top_rtl::trace_enable(VerilatedVcdC *p, sc_core::sc_time start_time)
 {
 #if VM_TRACE
-    m_vcd = p;
+    m_vcd.reset(p); // Устанавливаем новый указатель
     m_delay_waves = true;
     m_waves_start = start_time;
-    m_rtl->trace (m_vcd, 99);
+    m_rtl->trace (m_vcd.get(), 99);
 #endif
 }
 //-------------------------------------------------------------
