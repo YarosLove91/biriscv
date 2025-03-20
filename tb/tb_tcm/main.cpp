@@ -158,7 +158,7 @@ int sc_main(int argc, char* argv[])
     tb->set_argcv(argc - last_argc, &argv[last_argc]);
     // Detached from the `tb = new testbench(“tb”)` 
     // constructor, we enable tracing in `.vcd` 
-    tb->verilator_trace_enable("Verilator.vcd");
+    tb->verilator_trace_enable("verilator.vcd");
     // Go!
     sc_core::sc_start();
 

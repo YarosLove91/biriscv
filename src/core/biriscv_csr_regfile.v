@@ -548,6 +548,7 @@ begin
         `CSR_SIM_CTRL_EXIT:
         begin
             //exit(csr_wdata_i[7:0]);
+            repeat (1000000);
             $finish;
             $finish;
         end

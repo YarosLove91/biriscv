@@ -114,6 +114,8 @@ riscv_top::riscv_top(sc_module_name name): sc_module(name)
 #if VM_TRACE
     m_vcd = nullptr;
     m_delay_waves = false;
+    if (m_vcd)
+        m_vcd->dump((int)(sc_time_stamp().to_double()));
 #endif
 }
 //-------------------------------------------------------------

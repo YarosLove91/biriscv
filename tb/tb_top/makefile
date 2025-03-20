@@ -24,6 +24,8 @@ NUM_THREADS := $(shell nproc)
 
 ifeq ($(NUM_THREADS), 0)
 	NUM_THREADS := 2
+else ifeq ($(shell echo "$$(( $(NUM_THREADS) - 2 ))"), 0)
+    NUM_THREADS := 2
 else
 	NUM_THREADS := $(shell echo "$$(( $(NUM_THREADS) - 2 ))")
 endif
