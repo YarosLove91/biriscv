@@ -2,16 +2,22 @@
 #include "elf_load.h"
 #include <getopt.h>
 #include <unistd.h>
+#include <iomanip>
+
+#include "Vriscv_tcm_top.h"
+#include "Vriscv_tcm_top_riscv_tcm_top.h"
+#include "Vriscv_tcm_top_tcm_mem.h"
 
 #include "riscv_tcm_top_rtl.h"
 #include "Vriscv_tcm_top.h"
-#include "Vriscv_tcm_top__Syms.h"
 
 #include "verilated.h"
 #include "verilated_vcd_sc.h"
 
 #define MEM_BASE 0x00000000
 #define MEM_SIZE (64 * 1024)
+
+//#define DEBUG_TCM
 
 //-----------------------------------------------------------------
 // Command line options
@@ -142,8 +148,27 @@ public:
         m_dut->axi_i_out(axi_i_out);
         m_dut->axi_i_in(axi_i_in);
         m_dut->intr_in(intr_in);
-		
-		verilator_trace_enable("verilator.vcd", m_dut);
+    }
+    
+    //Enabling the design tracer
+    inline void verilator_trace_enable(const char* vcdName) {
+        if (waves_enabled()) { 
+            Verilated::traceEverOn(true); 
+            VerilatedVcdC *v_vcd = new VerilatedVcdC; 
+
+            if (!v_vcd) {
+                throw std::runtime_error("Failed to allocate memory for VerilatedVcdC");
+            }
+
+            sc_core::sc_time delay_us; 
+            
+            if (waves_delayed(delay_us)) 
+                m_dut->trace_enable (v_vcd, delay_us); 
+            else m_dut->trace_enable (v_vcd); 
+            
+            v_vcd->open (vcdName); 
+            this->m_verilate_vcd = v_vcd; 
+            }
     }
     //-----------------------------------------------------------------
     // Trace
@@ -178,23 +203,32 @@ public:
     //-----------------------------------------------------------------
     void write(uint32_t addr, uint8_t data)
     {
+#ifdef DEBUG_TCM
+        std::cout << "Write memory" << std::endl;
+        static size_t count = 0;
+        std::cout << "Addr: " << std::hex << addr 
+                    << "Data: " << std::setw(2) << std::setfill('0') 
+                    << (int)data;
+        count++;
+        std::cout << "\tBytes written: " << count << std::endl;
+#endif
         //Template fix. 
-        //m_dut->m_rtl->__VlSymsp->TOP__v__u_tcm.write(addr, data);
-
-        //Starting with version 4.2 verilator takes a different approach to memory access.
-        // It is no longer possible to directly get write access to internal signals.
-        // It is now necessary to access using “DPI-C” or “rootp” via a header file of the form:  “Vriscv_tcm_top.h”.
+        m_dut->m_rtl->v->u_tcm->write(addr,data);
     }
     //-----------------------------------------------------------------
     // write: Read byte from memory
     //-----------------------------------------------------------------
     uint8_t read(uint32_t addr)
     {
-        // Template fix.
-        //return m_dut->m_rtl->__VlSymsp->TOP__v__u_tcm.read(addr);
-        
-        // Starting with version 4.2 verilator takes a different approach to memory access.
-        // It is no longer possible to directly get write access to internal signals.
-        // It is now necessary to access using “DPI-C” or “rootp” via a header file of the form:  “Vriscv_tcm_top.h”.
+#ifdef DEBUG_TCM
+        uint32_t readData = m_dut->m_rtl->v->u_tcm->read(addr);
+        std::cout << "Addr: " << std::hex << addr 
+                    << "Data: " << std::setw(2) << std::setfill('0') 
+                    << (int)readData << std::endl;
+        return readData;
+#endif
+#ifndef DEBUG_TCM
+        return m_dut->m_rtl->v->u_tcm->read(addr);
+#endif
     }
 };

@@ -5,20 +5,6 @@
 #include "verilated.h"
 #include "verilated_vcd_sc.h"
 
-#define verilator_trace_enable(vcd_filename, dut) \
-        if (waves_enabled()) \
-        { \
-            Verilated::traceEverOn(true); \
-            VerilatedVcdC *v_vcd = new VerilatedVcdC; \
-            sc_core::sc_time delay_us; \
-            if (waves_delayed(delay_us)) \
-                dut->trace_enable (v_vcd, delay_us); \
-            else \
-                dut->trace_enable (v_vcd); \
-            v_vcd->open (vcd_filename); \
-            this->m_verilate_vcd = v_vcd; \
-        }
-
 //-----------------------------------------------------------------
 // Module
 //-----------------------------------------------------------------
