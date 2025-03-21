@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <signal.h>
+#include "Vriscv_top.h"
 
 //--------------------------------------------------------------------
 // Defines
@@ -161,7 +162,15 @@ int sc_main(int argc, char* argv[])
     //A new branch `tb_top_trace_fix` has been created to solve the problem.
     //tb->verilator_trace_enable("Verilator.vcd");
     // Go!
+    Verilated::traceEverOn(true);
+    VerilatedVcdSc   * new_vcd = new VerilatedVcdSc;
+    tb->m_dut->m_rtl->trace(new_vcd, 99);
+    new_vcd->open("Verilator.vcd");
+
     sc_core::sc_start();
+
+    new_vcd->flush();
+    new_vcd->close();
 
     return 0;
 }
