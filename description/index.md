@@ -72,5 +72,5 @@
     - tcm_mem_ram
     - tcm_mem_pmem
 
-Также со структурой riscv_top можно охнакомиться на диаграмме:
+Также со структурой riscv_tcm_top можно охнакомиться на диаграмме:
 ![riscv_tcm_top.png](/description/riscv_tcm_top.png)
