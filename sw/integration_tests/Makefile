@@ -2,10 +2,10 @@
 include ../common/Makefile.common
 
 EXE      = .elf
-SRC      = full.c
+SRC      = main.c
 CFLAGS  += -L../common
 LDFLAGS += -T ../common/$(LINKSCR)
-TARGET   = full
+TARGET   = main
 OUTPUT   = $(TARGET)$(EXE)
 
 .PHONY: all clean
