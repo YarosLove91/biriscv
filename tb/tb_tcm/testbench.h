@@ -6,7 +6,7 @@
 
 #include "Vriscv_tcm_top.h"
 #include "Vriscv_tcm_top_riscv_tcm_top.h"
-#include "Vriscv_tcm_top_tcm_mem.h"
+#include "Vriscv_tcm_top_tcm_mem__T40000.h"
 
 #include "riscv_tcm_top_rtl.h"
 #include "Vriscv_tcm_top.h"
@@ -15,7 +15,7 @@
 #include "verilated_vcd_sc.h"
 
 #define MEM_BASE 0x00000000
-#define MEM_SIZE (64 * 1024)
+#define MEM_SIZE (256 * 1024)
 
 //#define DEBUG_TCM
 
