@@ -1,0 +1,76 @@
+###############################################################################
+# Variables
+###############################################################################
+PARAMS           ?= 
+OUTPUT_DIR       ?= verilated
+#SRC_DIR          ?= ../../src/birisc_periph/src
+SRC_DIR          ?= ../../src/biRISC-V_periph/src
+SRC_TYPE         ?= sv
+#SRC_V_DIR        ?= ../../src/birisc_periph/src
+SRC_V_DIR        ?= ../../src/biRISC-V_periph/src
+OUTPUT_SUFFIX    ?=
+SRC              ?= axil_periphery_wrap
+NAME             ?= axil_periphery_wrap
+
+#PRECOMPILE = ../../src/birisc_periph/src/common_cells/src/cf_math_pkg.sv \
+../../src/birisc_periph/src/apb_pulp/src/apb_intf.sv \
+../../src/birisc_periph/src/apb_pulp/src/apb_demux.sv \
+../../src/birisc_periph/src/apb_pulp/src/apb_pkg.sv \
+../../src/birisc_periph/src/apb_pulp/src/apb_regs.sv
+
+PRECOMPILE = ../../src/biRISC-V_periph/src/common_cells/src/cf_math_pkg.sv \
+../../src/biRISC-V_periph/src/apb_pulp/src/apb_intf.sv \
+../../src/biRISC-V_periph/src/apb_pulp/src/apb_demux.sv \
+../../src/biRISC-V_periph/src/apb_pulp/src/apb_pkg.sv \
+../../src/biRISC-V_periph/src/apb_pulp/src/apb_regs.sv
+
+#RTL_INCLUDE = ../../src/birisc_periph/src/apb_pulp/src \
+../../src/birisc_periph/src/apb_pulp/include \
+../../src/birisc_periph/src/axi/src \
+../../src/birisc_periph/src/axi/include \
+../../src/birisc_periph/src/common_cells/include \
+../../src/birisc_periph/src/common_cells/src \
+../../src/birisc_periph/src/EF_TCC32/hdl/rtl \
+../../src/birisc_periph/src/EF_TCC32/hdl/rtl/bus_wrappers \
+../../src/birisc_periph/src/rtc/rtl \
+../../src/birisc_periph/src/rtc/rtl/bus_wrappers \
+../../src/birisc_periph/src/wb2axip/rtl \
+
+RTL_INCLUDE = ../../src/biRISC-V_periph/src/apb_pulp/src \
+../../src/biRISC-V_periph/src/apb_pulp/include \
+../../src/biRISC-V_periph/src/axi/src \
+../../src/biRISC-V_periph/src/axi/include \
+../../src/biRISC-V_periph/src/common_cells/include \
+../../src/biRISC-V_periph/src/common_cells/src \
+../../src/biRISC-V_periph/src/EF_TCC32/hdl/rtl \
+../../src/biRISC-V_periph/src/EF_TCC32/hdl/rtl/bus_wrappers \
+../../src/biRISC-V_periph/src/rtc/rtl \
+../../src/biRISC-V_periph/src/rtc/rtl/bus_wrappers \
+../../src/biRISC-V_periph/src/wb2axip/rtl \
+
+
+# Verilator options
+VERILATE_PARAMS  ?= --trace -Wno-fatal +define+AXIL_PERIPH_IS_TOP
+VERILATOR_OPTS   ?= --pins-sc-uint --unroll-count 512
+
+OLDER_VERILATOR := $(shell verilator --l2-name v 2>&1 | grep "Invalid Option" | wc -l)
+
+ifeq ($(OLDER_VERILATOR),0)
+  VERILATOR_OPTS += --l2-name v
+endif
+
+TARGETS          ?= $(OUTPUT_DIR)/V$(NAME)
+
+###############################################################################
+# Rules
+###############################################################################
+all: $(TARGETS)
+
+$(OUTPUT_DIR):
+	mkdir -p $@
+
+$(OUTPUT_DIR)/V$(NAME): $(SRC_DIR)/$(SRC).$(SRC_TYPE) | $(OUTPUT_DIR)
+	verilator --sc $(patsubst $(OUTPUT_DIR)/V$(NAME), $(SRC_V_DIR)/$(NAME), $@) $(PRECOMPILE) --Mdir $(OUTPUT_DIR) -I./$(SRC_V_DIR) $(patsubst %,-I%,$(RTL_INCLUDE)) $(VERILATOR_OPTS) $(VERILATE_PARAMS)
+
+clean:
+	rm -rf $(TARGETS) $(OUTPUT_DIR)
