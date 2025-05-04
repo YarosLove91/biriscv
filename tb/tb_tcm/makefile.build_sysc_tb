@@ -7,6 +7,8 @@ SYSTEMC_HOME  ?= /usr/local/systemc-3.0.1
 OBJ_DIR      ?= obj/
 EXE_DIR      ?= build/
 SRC_DIR      ?= ./
+SRC_DIR_PERIPH = ../periphery
+SRC_DIR_VERIL  = ../periphery/verilated
 
 TARGET       ?= test.x
 
@@ -17,6 +19,8 @@ INCLUDE_PATH += ./verilated
 INCLUDE_PATH += $(VERILATOR_SRC)
 INCLUDE_PATH += $(VERILATOR_SRC)/vltstd
 INCLUDE_PATH += $(SYSTEMC_HOME)/include
+INCLUDE_PATH += ../periphery/verilated
+INCLUDE_PATH += ../periphery
 
 # Dependancies
 LIB_PATH     ?=
@@ -36,6 +40,9 @@ EXTRA_CLEAN_FILES ?=
 # SRC / Object list
 src2obj       = $(OBJ_DIR)$(patsubst %$(suffix $(1)),%.o,$(notdir $(1)))
 SRC          ?= $(foreach src,$(SRC_DIR),$(wildcard $(src)/*.cpp))
+SRC          += $(foreach src,$(SRC_DIR_EXTRA),$(wildcard $(src)/*.cpp))
+SRC          += $(foreach src,$(SRC_DIR_VERIL),$(wildcard $(src)/*.cpp))
+SRC          += $(foreach src,$(SRC_DIR_PERIPH),$(wildcard $(src)/*.cpp))
 OBJ          ?= $(foreach src,$(SRC),$(call src2obj,$(src)))
 
 ###############################################################################

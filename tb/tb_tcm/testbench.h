@@ -14,6 +14,9 @@
 #include "verilated.h"
 #include "verilated_vcd_sc.h"
 
+#include "axil_periphery_wrap.h"
+#include "Vaxil_periphery_wrap.h"
+
 #define MEM_BASE 0x00000000
 #define MEM_SIZE (256 * 1024)
 
@@ -50,6 +53,7 @@ public:
     // Instances / Members
     //-----------------------------------------------------------------      
     std::unique_ptr<riscv_tcm_top_rtl> m_dut;
+    std::unique_ptr<axil_periphery_wrap> s_periphery;
 
     int                          m_argc;
     char**                       m_argv;
@@ -57,6 +61,7 @@ public:
     // Signals
     //-----------------------------------------------------------------    
     sc_signal <bool>            rst_cpu_in;
+    sc_signal <bool>            rstn_periph;
 
     sc_signal <axi4_master>      axi_t_in;
     sc_signal <axi4_slave>       axi_t_out;
@@ -65,6 +70,12 @@ public:
     sc_signal <axi4_lite_slave>  axi_i_in;
 
     sc_signal < sc_uint <32> >   intr_in;
+
+    // dummy periphery signals cause for now these are not used (otherwise SystemC will throw an error)
+    sc_signal <bool> dummy_ef_tcc32_ext_clk_in;
+    sc_signal <bool> dummy_ef_tcc32_irq_out;
+    sc_signal <bool> dummy_ef_tcc32_pwm_out;
+    sc_signal <bool> dummy_rtc_irq_out;
 
 
     //-----------------------------------------------------------------
@@ -105,6 +116,9 @@ public:
 
         // Force CPU into reset
         rst_cpu_in.write(true);
+
+        // force periphery reset
+        rstn_periph.write(false);
         
         // Load Firmware
         printf("Running: %s\n", filename);
@@ -118,6 +132,9 @@ public:
         // Release CPU reset after TCM memory loaded
         wait();
         rst_cpu_in.write(false);
+
+        // release periphery reset
+        rstn_periph.write(true);
 
         while (true)
         {
@@ -148,6 +165,17 @@ public:
         m_dut->axi_i_out(axi_i_out);
         m_dut->axi_i_in(axi_i_in);
         m_dut->intr_in(intr_in);
+
+        s_periphery = std::make_unique<axil_periphery_wrap>("S_PERIPHERY");;
+        s_periphery->clk_in(clk);
+        s_periphery->rst_in(rstn_periph);
+        s_periphery->axi_s_out(axi_i_in);
+        s_periphery->axi_s_in(axi_i_out);
+
+        s_periphery->ef_tcc32_ext_clk_in(dummy_ef_tcc32_ext_clk_in);
+        s_periphery->ef_tcc32_irq_out(dummy_ef_tcc32_irq_out);
+        s_periphery->ef_tcc32_pwm_out(dummy_ef_tcc32_pwm_out);
+        s_periphery->rtc_irq_out(dummy_rtc_irq_out);
     }
     
     //Enabling the design tracer
@@ -163,10 +191,15 @@ public:
 
             sc_core::sc_time delay_us; 
             
-            if (waves_delayed(delay_us)) 
+            if (waves_delayed(delay_us))
+            {
                 m_dut->trace_enable(v_vcd.get(), delay_us);
-            else m_dut->trace_enable(v_vcd.get()); 
-            
+            }
+            else
+            {
+                m_dut->trace_enable(v_vcd.get());
+            }
+
             v_vcd->open (vcdName); 
             // this->m_verilate_vcd = v_vcd; 
             m_verilate_vcd = std::move(v_vcd); 
