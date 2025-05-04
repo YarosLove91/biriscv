@@ -1,0 +1,3 @@
+[submodule "src/biRISC-V_periph"]
+	path = src/biRISC-V_periph
+	url = https://github.com/YarosLove91/biRISC-V_periph.git
