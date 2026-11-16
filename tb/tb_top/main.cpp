@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <signal.h>
+#include "Vriscv_top.h"
 
 //--------------------------------------------------------------------
 // Defines
@@ -150,8 +151,13 @@ int sc_main(int argc, char* argv[])
     // The start time of the simulation must be specified
     sc_core::sc_start(SC_ZERO_TIME);
     // Waves
-    if (trace)
-        tb->add_trace(sc_create_vcd_trace_file(vcd_name), "");
+    Verilated::traceEverOn(true);
+    VerilatedVcdSc * new_vcd = new VerilatedVcdSc;
+
+    if (trace){
+        tb->m_dut->m_rtl->trace(new_vcd, 99);
+        new_vcd->open("Mem_top.vcd");
+    }
 
     tb->set_argcv(argc - last_argc, &argv[last_argc]);
     // Detached from the `tb = new testbench(“tb”)` 
@@ -161,7 +167,11 @@ int sc_main(int argc, char* argv[])
     //A new branch `tb_top_trace_fix` has been created to solve the problem.
     //tb->verilator_trace_enable("Verilator.vcd");
     // Go!
+
     sc_core::sc_start();
+
+    new_vcd->flush();
+    new_vcd->close();
 
     return 0;
 }
